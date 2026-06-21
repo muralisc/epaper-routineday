@@ -1,4 +1,4 @@
-# epaper-workday
+# epaper-routineday
 
 A focused workday timer for the [Waveshare 3.52" e-Paper HAT](https://www.waveshare.com/3.52inch-e-paper-hat.htm) on a Raspberry Pi.
 
