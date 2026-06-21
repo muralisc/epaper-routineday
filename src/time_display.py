@@ -7,9 +7,19 @@ import logging
 import argparse
 from PIL import Image, ImageDraw, ImageFont
 
-BASE_DIR = os.path.dirname(os.path.realpath(__file__))
-LIBDIR = os.path.join(BASE_DIR, 'e-Paper/RaspberryPi_JetsonNano/python/lib')
-PICDIR = os.path.join(BASE_DIR, 'e-Paper/RaspberryPi_JetsonNano/python/pic')
+# Waveshare vendor library location.
+# Override with WAVESHARE_EPD_HOME env var if yours is elsewhere.
+_WAVESHARE_HOME = os.environ.get(
+    'WAVESHARE_EPD_HOME',
+    os.path.expanduser('~/waveshare-e-paper-352')
+)
+LIBDIR = os.path.join(_WAVESHARE_HOME, 'e-Paper/RaspberryPi_JetsonNano/python/lib')
+PICDIR = os.path.join(_WAVESHARE_HOME, 'e-Paper/RaspberryPi_JetsonNano/python/pic')
+
+if not os.path.isdir(LIBDIR):
+    sys.exit(f"Waveshare library not found at {LIBDIR}\n"
+             f"Set WAVESHARE_EPD_HOME to the correct path.")
+
 sys.path.append(LIBDIR)
 
 from waveshare_epd import epd3in52
