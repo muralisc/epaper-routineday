@@ -174,7 +174,7 @@ def main():
     epd.send_command(0x50)
     epd.send_data(0x17)
 
-    font_big = ImageFont.truetype(FONT_PATH, 56)   # elapsed / remaining
+    font_big = ImageFont.truetype(FONT_PATH, 50)   # elapsed / remaining
     font_med = ImageFont.truetype(FONT_PATH, 20)   # start / end times, quote
     font_small = ImageFont.truetype(FONT_PATH, 17) # section labels
     font_time = ImageFont.truetype(FONT_PATH, 22)  # current time and date
