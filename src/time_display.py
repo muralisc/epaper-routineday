@@ -190,7 +190,7 @@ def main():
             else:
                 image = build_offhours_image(epd, now, fonts)
 
-            epd.display(epd.getbuffer(image))
+            epd.display(epd.getbuffer(image.rotate(180)))
             epd.lut_GC()
             epd.refresh()
 
