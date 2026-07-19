@@ -5,6 +5,7 @@ import time
 import datetime
 import logging
 import argparse
+import signal
 from PIL import Image, ImageDraw, ImageFont
 
 # Waveshare vendor library location.
@@ -126,6 +127,28 @@ def build_working_image(epd, now, fonts, start_time, end_time):
     return image
 
 
+class ShutdownSignal(Exception):
+    pass
+
+
+def _handle_sigterm(signum, frame):
+    raise ShutdownSignal()
+
+
+def build_poweroff_image(epd, now, fonts):
+    W, H = epd.height, epd.width
+    image = Image.new('1', (W, H), 255)
+    draw = ImageDraw.Draw(image)
+    font_big, font_med, font_small, font_time = fonts
+
+    y = 40
+    y += centered(draw, "I was turned off at", font_med, y, W) + 12
+    y += centered(draw, now.strftime("%H:%M"), font_big, y, W) + 12
+    centered(draw, now.strftime("%a %d %b %Y"), font_med, y, W)
+
+    return image
+
+
 def build_offhours_image(epd, now, fonts):
     W, H = epd.height, epd.width
     image = Image.new('1', (W, H), 255)
@@ -180,6 +203,8 @@ def main():
     font_time = ImageFont.truetype(FONT_PATH, 22)  # current time and date
     fonts = (font_big, font_med, font_small, font_time)
 
+    signal.signal(signal.SIGTERM, _handle_sigterm)
+
     try:
         while True:
             now = datetime.datetime.now()
@@ -206,6 +231,16 @@ def main():
     except KeyboardInterrupt:
         logger.info("Stopping — clearing display")
         epd.Clear()
+        epd.sleep()
+        epd3in52.epdconfig.module_exit(cleanup=True)
+
+    except ShutdownSignal:
+        logger.info("Received SIGTERM — showing power-off screen")
+        now = datetime.datetime.now()
+        image = build_poweroff_image(epd, now, fonts)
+        epd.display(epd.getbuffer(image.rotate(180)))
+        epd.lut_GC()
+        epd.refresh()
         epd.sleep()
         epd3in52.epdconfig.module_exit(cleanup=True)
 
