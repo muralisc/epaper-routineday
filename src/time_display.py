@@ -64,7 +64,8 @@ def build_working_image(epd, now, fonts, start_time, end_time):
     W, H = epd.height, epd.width
     image = Image.new('1', (W, H), 255)
     draw = ImageDraw.Draw(image)
-    font_big, font_med, font_small, font_time = fonts
+    font_big_work, font_big_offhours, font_med, font_small, font_time = fonts
+    font_big = font_big_work
     margin = 10
     GAP = 12
 
@@ -130,11 +131,11 @@ def build_offhours_image(epd, now, fonts):
     W, H = epd.height, epd.width
     image = Image.new('1', (W, H), 255)
     draw = ImageDraw.Draw(image)
-    font_big, font_med, font_small, font_time = fonts
+    font_big_work, font_big_offhours, font_med, font_small, font_time = fonts
     margin = 10
 
     y = 10
-    y += centered(draw, now.strftime("%H:%M"), font_big, y, W) + 10
+    y += centered(draw, now.strftime("%H:%M"), font_big_offhours, y, W) + 10
 
     draw.line([(margin, y), (W - margin, y)], fill=0, width=2)
     y += 14
@@ -174,11 +175,12 @@ def main():
     epd.send_command(0x50)
     epd.send_data(0x17)
 
-    font_big = ImageFont.truetype(FONT_PATH, 90)   # elapsed / remaining
+    font_big_work = ImageFont.truetype(FONT_PATH, 70)      # elapsed / remaining
+    font_big_offhours = ImageFont.truetype(FONT_PATH, 90)  # off-hours clock
     font_med = ImageFont.truetype(FONT_PATH, 20)   # start / end times, quote
     font_small = ImageFont.truetype(FONT_PATH, 17) # section labels
     font_time = ImageFont.truetype(FONT_PATH, 22)  # current time and date
-    fonts = (font_big, font_med, font_small, font_time)
+    fonts = (font_big_work, font_big_offhours, font_med, font_small, font_time)
 
     try:
         while True:
